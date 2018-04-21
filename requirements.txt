@@ -1,2 +1,2 @@
 -r requirements/base.txt
--r requirements/heroku.txt
+-r requirements/server.txt
