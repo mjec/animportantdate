@@ -16,8 +16,8 @@ import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+BASE_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir))
 PACKAGE_ROOT = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = PACKAGE_ROOT
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,6 +25,9 @@ BASE_DIR = PACKAGE_ROOT
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'bleepbloop'
+
+if "DJANGO_SECRET_KEY" in os.environ:
+    SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -46,8 +49,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_countries',
     'wedding',
-    'bootstrap3',
     'compressor',
+    'raven.contrib.django.raven_compat',
+    'solo.apps.SoloAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -123,7 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
@@ -135,8 +139,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'public')
 STATIC_URL = '/static/'
+
+# In general, putting MEDIA_ROOT inside STATIC_ROOT is a Bad Idea™ but we
+# already totally trust anyone who can upload files, so we'll do it just this
+# once.
+MEDIA_ROOT = os.path.join(STATIC_ROOT, 'uploads')
+MEDIA_URL = '/static/uploads/'
 
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
@@ -151,6 +161,11 @@ STATICFILES_FINDERS = (
 
 #STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 500 * 24 * 60 * 60 # 500 days is a long time, but that's okay
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SESSION_COOKIE_NAME = 'session'
+
 # Sass!
 
 COMPRESS_ENABLED = True
@@ -158,19 +173,70 @@ COMPRESS_PRECOMPILERS = (
     ('text/x-scss', 'django_libsass.SassCompiler'),
 )
 
+# Logging
+
+if "SENTRY_DSN" in os.environ:
+    SENTRY_DSN = os.environ['SENTRY_DSN']
+
+    RAVEN_CONFIG = {
+        'dsn': SENTRY_DSN,
+        'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
+    }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'log/django_log'),
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
+        },
+        'sentry': {
+            'level': 'WARNING',
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['file', 'mail_admins', 'sentry'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django': {
+            'handlers': ['file', 'mail_admins', 'sentry'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+# Email
 MANAGERS = [
-    ("Chris", "_@chrisjrn.com"),
-    ("Josh", "meow@josh.cat"),
+    ("Michael Cordover", "animportantdate@mjec.net"),
 ]
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-''' All mailouts bcc into the following address list '''
-MAILOUTS_ARCHIVE_ADDRESS = ["bcc_archive@example.com"]
+EMAIL_SUBJECT_PREFIX = "[Wedding] "
 
-''' All mailouts are sent from this address '''
-MAILOUTS_FROM_ADDRESS = '"Alice and Bob" <from_address@example.com>'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+COUNTRIES_ONLY = ['US' ,'AU', 'NZ', 'IL']
+
+if "EMAIL_HOST" in os.environ and "EMAIL_USER" in os.environ and "EMAIL_PASSWORD" in os.environ:
+    EMAIL_HOST = os.environ["EMAIL_HOST"]
+    EMAIL_HOST_USER = os.environ["EMAIL_USER"]
+    EMAIL_HOST_PASSWORD = os.environ["EMAIL_PASSWORD"]
+    EMAIL_PORT = 465
+    EMAIL_USE_SSL = True
+
+SERVER_EMAIL = 'animportantdate@mjec.net'
 
 try:
-    from local_settings import *
+    from .local_settings import *
 except ImportError:
     pass

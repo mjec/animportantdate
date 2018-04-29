@@ -1,66 +1,94 @@
-{% extends "bootstrap_theme/base.html" %}
-{% load bootstrap3 %}
+{% extends "base.html" %}
+{% load solo_tags %}
 
 {% block content %}
 <div class="page-header">
-  <h1>You&rsquo;re invited!</h1>
+  <h1>You’re invited!</h1>
 </div>
 
-<div class="intro">
-  <p>We are getting married, and we want you, {{ group.display_name }}, to join us! We&rsquo;ll be using this website to help you arrange travel and lodging. Below is a summary of events and a form for you to fill out your contact information.</p>
+{% get_solo 'wedding.SiteConfiguration' as site_config %}
 
-  {% if group.person_set.all %}
+<div>
+  <p>We are getting married, and we want you, <strong>{{ group.display_name }}</strong>,
+    to join us! We’ll be using this website to help you arrange travel and lodging. Below
+    is a form for you to let us know the best way to contact you.</p>
+  <p>If you want to get in touch directly, you can email us at
+    <a href="mailto:{{ site_config.mailouts_from_email }}">{{ site_config.mailouts_from_email }}</a>.</p>
+{% comment %}
+<form method="post">
+  {% csrf_token %}
+    {{ person_formset.as_p }}
+
+  <!-- {% if group.person_set.all.count == 1 %}
+    {% for person in group.person_set.all %}
+      
+    {% endfor %}
+  {% elif group.person_set.all.count > 0 %}
     <h3>People in your group:</h3>
-    <ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Diretary restrictions</th>
+          <th>RSVP</th>
+        </tr>
+      </thead>
       {% for person in group.person_set.all %}
-        <li>{{ person.name }}</li>
+        <tr>
+          <td><input type="text" value="{{ person.name }}"></td>
+          <td><input type="email" value="{{ person.email }}"></td>
+          <td><input type="text" value="{{ person.dietary_restrictions }}"></td>
+          <td><input type="text" value="{{ person.rsvp_status }}"></td>
+        </tr>
       {% endfor %}
-    </ul>
-  {% endif %}
-
-  <p>Please complete the form so that we can send your invitations and keep in touch:</p>
+    </table>
+  {% endif %} -->
+</form>
+{% endcomment %}
 </div>
 
-<div class="row">
-  <div class="col-xs-8">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Contact Information</h3>
-      </div>
-      <div class="panel-body">
-        <form method="POST">
-          {% csrf_token %}
-          {% bootstrap_form group_form %}
+<div>
+  <h2>Contact information</h2>
+  <p>Please let us know how best to reach you, so we can keep you up-to-date on
+    wedding plans. If everything looks okay, you don't have to re-save your
+    details.</p>
+  <div class="flex-form">
+  <form method="post">
+    {% csrf_token %}
+    {{ gorup_form.non_field_errors }}
+    {% for field in group_form %}
+      {{ field.errors }}
+    {% endfor %}
 
-          {% buttons %}
-          <button type="submit" class="btn btn-primary pull-glyph-right">
-            {% bootstrap_icon "pencil" %} Save Details
-          </button>
-          {% endbuttons %}
-        </form>
-      </div>
-    </div>
+    {% for field in group_form %}
+      <p>
+        <label for="{{ field.id_for_label }}"{% if field.errors %} class="error"{% endif %}>{{ field.label }}</label>
+        {{ field }}
+      </p>
+    {% endfor %}
+    <p><button type="submit">Save details</button></p>
+  </form>
   </div>
-
-  <aside class="col-xs-4">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Summary of Events</h3>
-      </div>
-      <div class="panel-body">
-        <dl id="events">
-          {% for event in group.events.all %}
-          <dt>{{ event.name }}</dt>
-          <dd>{{ event.date_time }}<br/>
-            {{ event.venue }}
-          </dd>
-          {% endfor %}
-        </dl>
-        <a href="/details" title="Where &amp; When" class="btn btn-default">
-          <span class="glyphicon glyphicon-calendar"></span> More Information
-        </a>
-      </div>
-    </div>
-  </aside>
 </div>
+{% comment %}
+<div>
+  <h2>Summary of events</h2>
+  <p>
+    <a href="/details" title="Where + When">
+      <i class="fas fa-xs fa-fw fa-calendar"></i>&nbsp;Full details
+    </a>
+  </p>
+
+  <dl id="events">
+    {% for event in group.events.all %}
+    <dt>{{ event.name }}</dt>
+    <dd>{{ event.date_time }}<br/>
+      {{ event.venue }}<br/>
+      {{ event.address }}
+    </dd>
+    {% endfor %}
+  </dl>
+</div>
+{% endcomment %}
 {% endblock content %}

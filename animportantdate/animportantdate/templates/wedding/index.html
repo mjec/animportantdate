@@ -1,28 +1,22 @@
-{% extends "bootstrap_theme/base.html" %}
+{% extends "base.html" %}
 
-{# Load the tag library #}
-{% load bootstrap3 %}
+{% load static %}
 
 {% block content %}
-<div class="row">
-  <div class="col-xs-3" id="sidebar">
-    <div id="container">
-      <div class="page-header">
-        <h1>Chris and Josh are getting married!</h1>
-      </div>
+  <h1>
+    <span class="replace-on-hover" data-replacement-text="Curls" data-original-text="Michelle"></span>
+      +
+    <span class="replace-on-hover" data-replacement-text="Beard" data-original-text="Michael"></span>
+  </h1>
 
-      <p>Enter your code to confirm your contact details, RSVP, and get more information about the events, travel, and lodging.</p>
-      <form method="GET" class="form">
-        {% bootstrap_form auth_form %}
-        {% buttons %}
-        <p>
-          <button type="submit" class="btn btn-primary pull-glyph-right">
-            {% bootstrap_icon "menu-right" %} Continue
-          </button>
-        </p>
-        {% endbuttons %}
-      </form>
-    </div>
-  </div>
-</div>
+  <p><img src="{% static "curlsandbeard.jpg" %}" alt="" role="presentation"></p>
+
+  <p>Enter your code to confirm your contact details, RSVP, and get more information about the events, travel, and lodging.</p>
+
+  <form method="GET" class="auth-form">
+    {{ auth_form.as_p }}
+    <p>
+      <button type="submit">Continue <i class="fas fa-chevron-circle-right"></i></button>
+    </p>
+  </form>
 {% endblock %}

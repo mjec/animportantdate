@@ -1,0 +1,101 @@
+{% load static %}{% load compress %}<!DOCTYPE html>
+<html>
+<!--
+
+Love is a splendid thing; and making websites is hard work.
+
+This website owes most of its existence to the magnificent MIT-licensed
+animportantdate by Josh Simmons and Chris Neugebauer.
+
+Code for this site is available at https://github.com/mjec/animportantdate/.
+
+-->
+{% block html_head_base %}
+  <head>
+    <title>Michelle &amp; Michael are getting married</title>
+    <link type="image/x-icon" rel="icon" href="{% static "favicon.ico" %}">
+    <link type="image/x-icon" rel="shortcut icon" href="{% static "favicon.ico" %}">
+    {% compress css %}
+      <link rel="stylesheet" type="text/x-scss" href="{% static "base.scss" %}">
+    {% endcompress %}
+
+    <meta property="og:title" content="Michelle and Michael are getting married">
+    <meta property="og:site_name" content="Michelle and Michael are getting married">
+    <meta property="og:image" content=""{% static "images/mm.jpg" %}"">
+    <meta property="og:url" content="https://curlsandbeard.com/">
+
+    <meta content="width=device-width, height=device-height" name="viewport">
+  {% block html_head %}
+  {% endblock %}
+  </head>
+{% endblock %}
+
+{% block html_body %}
+  <body class="{{ body_class }}">
+    <header >
+      <nav>
+        <input id="menu-expander" type="checkbox" aria-hidden=”true” role=”presentation”>
+        <ul>
+          <li id="menu-expander-label"><label for="menu-expander" aria-hidden=”true” role=”presentation”><i class="fas fa-bars"></i>&nbsp;Menu</label></li>
+          {% if not request.session.confirmation_code %}
+          <li class="home"><a href="/"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-home"></i>&nbsp;<span class="text">Home</span></a></li>
+          {% endif %}
+          <li class="story"><a href="/story"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-heart"></i>&nbsp;<span class="text">Our Story</span></a></li>
+          {% if request.session.confirmation_code %}
+          <li class="guest"><a href="/guest"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-user-circle"></i>&nbsp;<span class="text">Your Details</span></a></li>
+          {% endif %}
+          <li class="detail"><a href="/details"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-calendar"></i>&nbsp;<span class="text">Where + When</span></a></li>
+          <li class="gift"><a href="/gifts"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-gift"></i>&nbsp;<span class="text">Gifts</span></a></li>
+          <li class="photo"><a href="/photos"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-camera"></i>&nbsp;<span class="text">Photos</span></a></li>
+          {% if request.user.is_staff %}
+          <li><a href="{% url 'admin:index' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-cog"></i>&nbsp;<span class="text">Admin</span></a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </header>
+
+    <div class="container">
+      {% if messages %}
+        {% block messages %}
+        <section>
+          <ul class="messages">
+            {% for message in messages %}
+              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endblock %}
+      {% endif %}
+
+      <main>
+        {% block content_base %}
+          {% block content %}
+            <!-- content goes here -->
+          {% endblock content %}
+        {% endblock content_base %}
+      </main>
+    </div>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/solid.js" integrity="sha384-Q7KAHqDd5trmfsv85beYZBsUmw0lsreFBQZfsEhzUtUn5HhpjVzwY0Aq4z8DY9sA" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/fontawesome.js" integrity="sha384-M2FSA4xMm1G9m4CNXM49UcDHeWcDZNucAlz1WVHxohug0Uw1K+IpUhp/Wjg0y6qG" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+      var _paq = _paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u="//piwik.mjec.net/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', '14']);
+        {% if request.session.group_id %}
+        _paq.push(['setUserId', '{{ request.session.group_id }}']);
+        {% endif %}
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+  </body>
+{% endblock html_body %}
+
+</html>

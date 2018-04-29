@@ -1,25 +1,41 @@
-{% extends "bootstrap_theme/base.html" %}
-
-{# Load the tag library #}
-{% load bootstrap3 %}
-
+{% extends "base.html" %}
+{% block html_head %}
+<style>
+iframe {
+  width: 100%;
+  max-width: 60em;
+  background: #ffffff;
+  height: 50ex;
+  border: none;
+}
+dl {
+  display: flex;
+  flex-flow: row wrap;
+}
+dt {
+  font-weight: bold;
+  width: 10em;
+  margin: 0.5ex 0;
+}
+dd {
+  width: calc(100% - 10em);
+  margin: 0.5ex 0;
+}
+</style>
+{% endblock %}
 {% block content %}
   <h1>Send mail to attendees</h1>
-  <h2>Mailout name: {{ mailout.name }}</h2>
+  <h2>{{ mailout.name }} <small>[<a href="{% url 'admin:wedding_mailout_change' mailout.pk %}">edit</a>]</small></h2>
   {% if mailout_form %}
+  <div class="flex-form">
     <form method="post" class="form">
       {% csrf_token %}
-      {% bootstrap_form mailout_form %}
-      {% buttons %}
-        <button type="submit" class="btn btn-primary">
-          {% bootstrap_icon "star" %} Submit
+      {{ mailout_form.as_p }}
+        <button type="submit">
+          Submit
         </button>
-        <a href="{% url 'admin:wedding_mailout_change' mailout.id %}" class="btn btn-info" role="button">
-          {% bootstrap_icon "edit" %} Return to admin page
-        </a>
-
-      {% endbuttons %}
     </form>
+  </div>
   {% endif %}
 
   {% if mailouts %}
@@ -27,7 +43,7 @@
     {% for message in mailouts %}
       <dl>
         <dt>From</dt><dd>{{ message.from_ }}</dd>
-        <dt>To</dt><dd>{{ message.recipient.email }}</dd>
+        <dt>To</dt><dd>"{{ message.recipient.name }}" &lt;{{ message.recipient.email }}&gt;</dd>
         <dt>Bcc</dt>
         <dd>
           {% for bcc in message.bcc %}
@@ -36,13 +52,11 @@
         </dd>
         <dt>Subject</dt><dd>{{ message.subject }}</dd>
         <dt>Body</dt><dd>
-            <pre>
-{{ message.body }}
-            </pre>
+            <iframe srcdoc="{{ message.html_body|force_escape }}"></iframe>
         </dd>
       </dl>
       {% if not forloop.last %}
-        <hr />
+        <hr>
       {% endif %}
     {% endfor %}
   {% endif %}
