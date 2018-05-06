@@ -139,7 +139,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'public')
+STATIC_ROOT = os.path.join(BASE_DIR, 'public/static')
 STATIC_URL = '/static/'
 
 # In general, putting MEDIA_ROOT inside STATIC_ROOT is a Bad Idea™ but we
@@ -180,7 +180,6 @@ if "SENTRY_DSN" in os.environ:
 
     RAVEN_CONFIG = {
         'dsn': SENTRY_DSN,
-        'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
     }
 
 LOGGING = {

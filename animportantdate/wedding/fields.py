@@ -8,6 +8,8 @@ class PnrField(models.CharField):
 
     @staticmethod
     def clean_pnr(dirty_pnr):
+        if dirty_pnr is None:
+            return dirty_pnr
         normalized_pnr = dirty_pnr.upper().replace("O", "0").replace("I", "1").replace("L", "1")
         return re.sub(PnrField.not_in_alphabet, '', normalized_pnr)
 
