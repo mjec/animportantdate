@@ -100,7 +100,7 @@ class Person(models.Model):
     )
 
     name = models.CharField(max_length=255, null=True)
-    email = models.EmailField(null=True)
+    email = models.EmailField(null=True, blank=True)
     group = models.ForeignKey(Group)
     rsvp_status = models.IntegerField(
         choices=RSVP_CHOICES,
