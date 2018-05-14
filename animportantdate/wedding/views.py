@@ -167,6 +167,7 @@ def mailout(request, mailout_id):
     data = {
         "mailout": mailout,
         "mailout_form": form,
+        "body_class": "mailout",
     }
 
     if request.POST and form.is_valid():

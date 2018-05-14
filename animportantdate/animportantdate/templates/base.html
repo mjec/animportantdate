@@ -38,15 +38,15 @@ Code for this site is available at https://github.com/mjec/animportantdate/.
         <ul>
           <li id="menu-expander-label"><label for="menu-expander" aria-hidden=”true” role=”presentation”><i class="fas fa-bars"></i>&nbsp;Menu</label></li>
           {% if not request.session.confirmation_code %}
-          <li class="home"><a href="/"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-home"></i>&nbsp;<span class="text">Home</span></a></li>
+          <li class="home"><a href="{% url 'home' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-home"></i>&nbsp;<span class="text">Home</span></a></li>
           {% endif %}
-          <li class="story"><a href="/story"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-heart"></i>&nbsp;<span class="text">Our Story</span></a></li>
+          <li class="story"><a href="{% url 'story' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-heart"></i>&nbsp;<span class="text">Our Story</span></a></li>
           {% if request.session.confirmation_code %}
-          <li class="guest"><a href="/guest"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-user-circle"></i>&nbsp;<span class="text">Your Details</span></a></li>
+          <li class="guest"><a href="{% url 'guest-details' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-user-circle"></i>&nbsp;<span class="text">Your Details</span></a></li>
           {% endif %}
-          <li class="detail"><a href="/details"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-calendar"></i>&nbsp;<span class="text">Where + When</span></a></li>
-          <li class="gift"><a href="/gifts"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-gift"></i>&nbsp;<span class="text">Gifts</span></a></li>
-          <li class="photo"><a href="/photos"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-camera"></i>&nbsp;<span class="text">Photos</span></a></li>
+          <li class="detail"><a href="{% url 'details' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-calendar"></i>&nbsp;<span class="text">Where + When</span></a></li>
+          <li class="gifts"><a href="{% url 'gifts' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-gift"></i>&nbsp;<span class="text">Gifts</span></a></li>
+          <li class="photo"><a href="{% url 'photos' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-camera"></i>&nbsp;<span class="text">Photos</span></a></li>
           {% if request.user.is_staff %}
           <li><a href="{% url 'admin:index' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-cog"></i>&nbsp;<span class="text">Admin</span></a></li>
           {% endif %}
@@ -81,7 +81,7 @@ Code for this site is available at https://github.com/mjec/animportantdate/.
 
     <script type="text/javascript">
       var _paq = _paq || [];
-      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['setDocumentTitle', '{{ body_class }}']);
       _paq.push(['trackPageView']);
       _paq.push(['enableLinkTracking']);
       (function() {

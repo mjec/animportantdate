@@ -101,7 +101,7 @@ class Person(models.Model):
 
     name = models.CharField(max_length=255, null=True)
     email = models.EmailField(null=True, blank=True)
-    group = models.ForeignKey(Group)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
     rsvp_status = models.IntegerField(
         choices=RSVP_CHOICES,
         default=RSVP_UNKNOWN,
@@ -158,7 +158,7 @@ class Mailout(models.Model):
         return self.mailsent_set.filter(last_opened__isnull=False).count()
 
     name = models.CharField(max_length=255)
-    event = models.ForeignKey(Event)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
     subject = models.CharField(max_length=255)
     plain_body = models.TextField()
     html_body = models.TextField(blank=True)
@@ -167,7 +167,7 @@ class Mailout(models.Model):
 class MailoutImage(models.Model):
     slug = models.SlugField()
     file = models.ImageField()
-    mailout = models.ForeignKey(Mailout, related_name='images')
+    mailout = models.ForeignKey(Mailout, related_name='images', on_delete=models.CASCADE)
     
     def __str__(self):
         return '{} for {}'.format(self.slug, self.mailout)
@@ -185,8 +185,8 @@ class MailSent(models.Model):
             return "{} sent to {} opened {}".format(self.mailout, self.recipient, self.last_opened)
         return "{} sent to {} not yet opened".format(self.mailout, self.recipient)
 
-    recipient = models.ForeignKey(Person)
-    mailout = models.ForeignKey(Mailout)
+    recipient = models.ForeignKey(Person, on_delete=models.CASCADE)
+    mailout = models.ForeignKey(Mailout, on_delete=models.CASCADE)
     datestamp = models.DateTimeField(auto_now_add=True)
     last_opened = models.DateTimeField(null=True)
     open_key = PnrField(max_length=6, unique=True)
@@ -207,7 +207,7 @@ class NeedToSend(models.Model):
         (THANKYOU_CARD, "Thank you card"),
     )
     
-    who = models.ForeignKey(Group)
+    who = models.ForeignKey(Group, on_delete=models.CASCADE)
     what = models.IntegerField(choices=THINGS_TO_SEND)
     why = models.TextField()
     added = models.DateField(auto_now_add=True)
@@ -219,7 +219,7 @@ class Note(models.Model):
     def __str__(self):
         return self.content
 
-    about = models.ForeignKey(Group, related_name='notes')
+    about = models.ForeignKey(Group, related_name='notes', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
 
