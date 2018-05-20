@@ -21,8 +21,10 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-] + (
-    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-) + [
     url(r'^', include('wedding.urls')),
 ]
+
+handler400 = 'wedding.views.page_not_found'
+handler403 = 'wedding.views.page_not_found'
+handler404 = 'wedding.views.page_not_found'
+handler500 = 'wedding.views.page_not_found'

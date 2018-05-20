@@ -140,6 +140,15 @@ def content_page(request, page_name=None):
     return render(request, "wedding/pages/%s.html" % page_name, data)
 
 
+def page_not_found(request):
+    data = {
+        "body_class": "error404",
+        "group": get_group(request),
+    }
+
+    return render(request, "wedding/pages/error404.html", data, status=404)
+
+
 @staff_member_required
 def mailout(request, mailout_id):
 
