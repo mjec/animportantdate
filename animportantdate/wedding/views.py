@@ -44,7 +44,7 @@ def guest_login(request, pnr, open_key):
         group = authenticate(request, pnr)
         try:
             email = models.MailSent.objects.get(open_key=open_key)
-            email.last_opened = timezone.now
+            email.last_opened = timezone.now()
             email.save()
             group.add_note('Email {} opened'.format(email.mailout))
         except:
