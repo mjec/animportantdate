@@ -158,7 +158,7 @@ def mailout(request, mailout_id):
 
     people_already_sent_id = models.MailSent.objects.filter(mailout=mailout).values('recipient__id').distinct()
     # groups_eligible = mailout.event.group_set.all()
-    people_eligible = models.Person.objects.filter(group__events=mailout.event, email__isnull=False)
+    people_eligible = models.Person.objects.filter(group__events=mailout.event, email__isnull=False).exclude(email='')
 
     initial = {
         "people": people_eligible.exclude(id__in=people_already_sent_id),
