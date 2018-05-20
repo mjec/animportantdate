@@ -4,6 +4,7 @@ from . import fields
 from collections import namedtuple
 from django.conf import settings
 from django.core import mail
+from django.utils import timezone
 from django.template import Context, Template  # TODO: use other engines?
 from email.mime.image import MIMEImage
 
@@ -19,12 +20,13 @@ class Message(MessageBase):
 
 class MailoutHelper(object):
 
-    def __init__(self, mailout, recipients, override_recipient=None, attach_images=True):
+    def __init__(self, mailout, recipients, override_recipient=None, attach_images=True, mark_as_sent=None):
         self.override_recipient = override_recipient
         self._mailout = mailout
         self._recipients = recipients
         self.image_attachments = []
         self.attach_images = attach_images
+        self.mark_as_sent = mark_as_sent
         if attach_images and mailout.html_body != "":
             for img in mailout.images.all():
                 mime_image = MIMEImage(img.file.read())
@@ -79,6 +81,8 @@ class MailoutHelper(object):
                         ))
         finally:
             models.MailSent.objects.bulk_create(sent)
+            if self.mark_as_sent:
+                models.NeedToSend.objects.filter(who__in=[r.recipient.group.pk for r in sent], what=self.mark_as_sent, sent__isnull=True).update(sent=timezone.now(), sent_note='Sent by email')
 
 
     def _render_single_message(self, recipient):

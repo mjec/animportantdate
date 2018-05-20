@@ -68,6 +68,7 @@ class DoMailoutForm(forms.Form):
     people = forms.ModelMultipleChoiceField(queryset=models.Person.objects)
     action = forms.TypedChoiceField(choices=ACTIONS, coerce=int)
     test_recipient = forms.EmailField(help_text='If "send test" is selected, send to this recipient instead', required=False)
+    mark_as_sent = forms.TypedChoiceField(choices=((None, '(Nothing)'),) + models.NeedToSend.THINGS_TO_SEND, coerce=int, required=False, initial=None, empty_value=None, help_text='Mark this as sent by the email')
 
     def clean(self):
         cleaned_data = super(DoMailoutForm, self).clean()

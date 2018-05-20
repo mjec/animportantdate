@@ -189,7 +189,7 @@ def mailout(request, mailout_id):
             test_recipient = form.cleaned_data["test_recipient"]
         
         try:
-            m = mailouts.MailoutHelper(mailout, form.cleaned_data["people"], test_recipient, send)
+            m = mailouts.MailoutHelper(mailout, form.cleaned_data["people"], test_recipient, send, form.cleaned_data["mark_as_sent"])
             data["mailouts"] = m.messages
         except Exception as e:
             messages.error(request, str(e))

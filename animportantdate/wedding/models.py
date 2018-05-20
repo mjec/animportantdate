@@ -201,10 +201,12 @@ class NeedToSend(models.Model):
 
     INVITATION = 1
     THANKYOU_CARD = 2
+    SAVE_THE_DATE = 3
 
     THINGS_TO_SEND = (
         (INVITATION, "Invitation"),
         (THANKYOU_CARD, "Thank you card"),
+        (SAVE_THE_DATE, "Save the date"),
     )
     
     who = models.ForeignKey(Group, on_delete=models.CASCADE)
