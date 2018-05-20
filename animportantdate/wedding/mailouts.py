@@ -83,13 +83,14 @@ class MailoutHelper(object):
 
     def _render_single_message(self, recipient):
         open_key = fields.PnrField.generate(6)
+        open_url = 'https://curlsandbeard.com/guest/{}/{}'.format(recipient.group.pnr, open_key)
 
         subject_t = Template(self._mailout.subject)
         plain_t = Template(self._mailout.plain_body)
         html_t = Template(self._mailout.html_body)
         context = Context({
             "recipient": recipient,
-            "open_key": open_key,
+            "open_url": open_url,
             "mailout": self._mailout,
             "attach_images": self.attach_images,
         })
