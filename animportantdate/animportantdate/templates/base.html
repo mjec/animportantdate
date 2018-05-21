@@ -46,7 +46,7 @@ Code for this site is available at https://github.com/mjec/animportantdate/.
           {% endif %}
           <li class="detail"><a href="{% url 'details' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-calendar"></i>&nbsp;<span class="text">Where + When</span></a></li>
           <li class="gifts"><a href="{% url 'gifts' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-gift"></i>&nbsp;<span class="text">Gifts</span></a></li>
-          <li class="photo"><a href="{% url 'photos' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-camera"></i>&nbsp;<span class="text">Photos</span></a></li>
+          <li class="photos"><a href="{% url 'photos' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-camera"></i>&nbsp;<span class="text">Photos</span></a></li>
           {% if request.user.is_staff %}
           <li><a href="{% url 'admin:index' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-cog"></i>&nbsp;<span class="text">Admin</span></a></li>
           {% endif %}

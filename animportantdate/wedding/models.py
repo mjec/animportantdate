@@ -2,6 +2,7 @@ from django.db import models
 from django_countries.fields import CountryField
 
 from solo.models import SingletonModel
+from sorl.thumbnail import ImageField
 
 from .fields import PnrField
 
@@ -225,6 +226,16 @@ class Note(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
 
+
+class Photo(models.Model):
+    image = ImageField()
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    order = models.IntegerField()
+
+    class Meta:
+        ordering = ['order']
+    
 
 class SiteConfiguration(SingletonModel):
     mailouts_from_name = models.CharField(max_length=60)

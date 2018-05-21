@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'compressor',
     'raven.contrib.django.raven_compat',
     'solo.apps.SoloAppConfig',
+    'sorl.thumbnail',
+    'admin_ordering',
 ]
 
 MIDDLEWARE = [
@@ -121,6 +123,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'animportantdate-hetdgahzixizgophkwev',
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/

@@ -6,6 +6,7 @@ from django.template.defaultfilters import escape
 from django.contrib.auth.models import User as AuthUser, Group as AuthGroup
 
 from solo.admin import SingletonModelAdmin
+from sorl.thumbnail.admin import AdminImageMixin
 
 from . import models
 from . import views
@@ -114,6 +115,18 @@ class MailoutAdmin(admin.ModelAdmin):
                 url=reverse("admin:wedding_event_change", args=(obj.event.pk,)),
                 display_name=escape(obj.event.name)))
     event_link.short_description = "Event"
+
+
+from admin_ordering.admin import OrderableAdmin
+
+@admin.register(models.Photo)
+class PhotoAdmin(AdminImageMixin, OrderableAdmin, admin.ModelAdmin):
+    list_display = ('name', 'description', 'order',)
+    list_editable = ('order',)
+    list_display_links = ('name', 'description',)
+    search_fields = ('name', 'description',)
+    ordering_field = 'order'
+
 
 admin.site.register(models.SiteConfiguration, SingletonModelAdmin)
 

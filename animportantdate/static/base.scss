@@ -34,8 +34,8 @@ body.gifts {
     background-color: $accent-light-17;
   }
 }
-body.photo {
-  header nav ul .photo {
+body.photos {
+  header nav ul .photos {
     background-color: $accent-light-17;
   }
 }
@@ -79,7 +79,6 @@ body {
     
     height: 1em;
     width: 100%;
-    z-index: 10001;
 
     #menu-expander,
     #menu-expander-label {

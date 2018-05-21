@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static thumbnail %}
+
+{% block html_head %}
+<link rel="stylesheet" href="{% static "lightgallery/css/lightgallery.min.css" %}">
+<script src="{% static "lightgallery/js/lightgallery.min.js" %}" defer></script>
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  lightGallery(
+    document.getElementById('gallery'),
+    {
+      download: false,
+      subHtmlSelectorRelative: true
+    }
+  );
+});
+</script>
+<style>
+#gallery .caption {
+  display: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Photos</h1>
+
+<p>We’ll be collecting photos before and during the wedding and posting them here.</p>
+
+<p>If you’d like to share photos from the wedding on social media, please use the hashtag <strong>#curlsandbeard</strong>.</p>
+
+<div id="gallery">
+  {% for photo in photos %}
+    {% thumbnail photo.image "100x100" crop="center" as thumb %}
+    <a href="{{ photo.image.url }}" data-sub-html=".caption">
+      <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}">
+      <div class="caption">
+        <h4>{{ photo.name }}</h4>
+        <p>{{ photo.description }}</p>
+      </div>
+    </a>
+    {% endthumbnail %}
+  {% endfor %}
+</div>
+
+{% endblock %}

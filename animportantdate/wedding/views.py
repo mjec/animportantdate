@@ -140,6 +140,16 @@ def content_page(request, page_name=None):
     return render(request, "wedding/pages/%s.html" % page_name, data)
 
 
+def photos(request):
+    data = {
+        "body_class": "photos",
+        "group": get_group(request),
+        "photos": models.Photo.objects.all(),
+    }
+
+    return render(request, "wedding/pages/photos.html", data)
+
+
 def page_not_found(request):
     data = {
         "body_class": "error404",
