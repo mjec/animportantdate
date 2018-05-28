@@ -4,7 +4,7 @@
 <style>
 .row {
   display: grid;
-  grid-template-columns: 3fr 3fr 1fr;
+  grid-template-columns: 3fr 3fr;
 }
 </style>
 {% endblock html_head %}
@@ -14,14 +14,12 @@
 <div class="row header">
   <p>Who</p>
   <p>Email</p>
-  <p>Invited to</p>
 </div>
 
 {% for person in object_list %}
 <div class="row" id="row-{{ forloop.counter }}">
   <p class="td" data-header="Who"><a href="{% url 'admin:wedding_person_change' person.pk %}">{{ person }}</a></p>
   <p class="td" data-header="Email">{{ person.email|default:"" }}</p>
-  <p class="td" data-header="Invited to">{{ person.group.events.all|join:", " }}</p>
 </div>
 {% endfor %}
 

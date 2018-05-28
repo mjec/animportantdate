@@ -4,7 +4,7 @@
 <style>
 .row {
   display: grid;
-  grid-template-columns: 5fr 1fr 5fr 2fr;
+  grid-template-columns: 5fr 1fr 5fr;
 }
 </style>
 {% endblock html_head %}
@@ -15,7 +15,6 @@
   <p>Who</p>
   <p>People</p>
   <p>Address</p>
-  <p>Invited to</p>
 </div>
 
 {% for group in object_list %}
@@ -23,7 +22,6 @@
   <p class="td" data-header="Who"><a href="{% url 'admin:wedding_group_change' group.pk %}">{{ group }}</a></p>
   <p class="td" data-header="People">{{ group.person_set.count }}</p>
   <p class="td" data-header="Address">{{ group.address|default:"&nbsp;" }}</p>
-  <p class="td" data-header="Invited to">{{ group.events.all|join:", " }}</p>
 </div>
 {% endfor %}
 
