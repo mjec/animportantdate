@@ -29,6 +29,11 @@ class Group(models.Model):
 
     address_fields = ('address_1', 'address_2', 'address_city', 'address_state_province', 'address_postal_code', 'address_country')
 
+    @property
+    def address(self):
+        fields = filter(lambda x: x, [self.address_1, self.address_2, self.address_city, self.address_state_province, self.address_postal_code, self.address_country.name])
+        return "\n".join(fields).strip()
+
     @classmethod
     def contains_address_field(cls, field_list):
         for f in cls.address_fields:
@@ -83,6 +88,9 @@ class Group(models.Model):
         blank=True,
         related_name="groups",
     )
+    
+    class Meta:
+        ordering = ['display_name']
 
 
 class Person(models.Model):
@@ -115,7 +123,7 @@ class Person(models.Model):
 class Event(models.Model):
 
     def __str__(self):
-        return self.name
+        return self.short_name
     
     def invited(self):
         return Person.objects.filter(group__events=self.pk).count()
@@ -194,11 +202,19 @@ class MailSent(models.Model):
 
 
 class NeedToSend(models.Model):
+    @staticmethod
+    def thing_to_send_name(thing):
+        return [e[1] for e in NeedToSend.THINGS_TO_SEND if e[0] == thing][0] or ''
+
     def __str__(self):
         return 'Need to send {} to {} ({})'.format(
-            [e[1] for e in NeedToSend.THINGS_TO_SEND if e[0] == self.what][0] or self.what,
+            self.thing_to_send_name(self.what) or self.what,
             self.who,
             'outstanding' if self.sent is None else 'done')
+
+    @property
+    def what_name(self):
+        return self.thing_to_send_name(self.what)
 
     INVITATION = 1
     THANKYOU_CARD = 2
@@ -228,10 +244,13 @@ class Note(models.Model):
 
 
 class Photo(models.Model):
+    def __str__(self):
+        return self.name or 'Photo #{}'.format(self.pk)
+
     image = ImageField()
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    order = models.IntegerField()
+    name = models.CharField(max_length=255, blank=True)
+    description = models.TextField(blank=True)
+    order = models.IntegerField(default=0)
 
     class Meta:
         ordering = ['order']

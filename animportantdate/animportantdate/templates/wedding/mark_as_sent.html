@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block html_head %}
+<style>
+textarea {
+  height: 7ex;
+}
+</style>
+{% endblock html_head %}
+{% block content %}
+<h1>{{ nts.what_name }}<br><small>{{nts.who}}</small></h1>
+
+<p>Added {{ nts.added }}</p>
+<p>{{ nts.why }}</p>
+
+<form method="post" class="form">
+  {% csrf_token %}
+  {% for field in form %}
+    {% if field.is_hidden %}
+      {{ field }}
+    {% else %}
+      <p>{{ field.label }}<br>
+        {% if field.errors %}{{ field.errors }}<br>{% endif %}
+      {{ field }}</p>
+    {% endif %}
+  {% endfor %}
+    <a href="{{ back_url }}">&laquo; Back</a>
+    <button type="submit" style="margin-left: 1em">
+      Mark as sent
+    </button>
+</form>
+
+{% endblock content %}

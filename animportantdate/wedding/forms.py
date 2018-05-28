@@ -9,6 +9,16 @@ class AuthForm(forms.Form):
         label="Confirmation code",
     )
 
+class MarkAsSentForm(forms.ModelForm):
+    row = forms.CharField(required=False, empty_value=None, widget=forms.HiddenInput)
+
+    class Meta:
+        model = models.NeedToSend
+        fields = [
+            "sent",
+            "sent_note",
+        ]
+
 
 class GroupForm(forms.ModelForm):
 
@@ -69,9 +79,10 @@ class DoMailoutForm(forms.Form):
     action = forms.TypedChoiceField(choices=ACTIONS, coerce=int)
     test_recipient = forms.EmailField(help_text='If "send test" is selected, send to this recipient instead', required=False)
     mark_as_sent = forms.TypedChoiceField(choices=((None, '(Nothing)'),) + models.NeedToSend.THINGS_TO_SEND, coerce=int, required=False, initial=None, empty_value=None, help_text='Mark this as sent by the email')
+    only_if_unsent = forms.TypedChoiceField(choices=((True, 'Only send if we can mark a thing as sent'), (False, 'Send even if nothing will be marked as sent')), coerce=bool, required=True, initial=True, help_text="Only send if there's an unsent thing to mark as sent")
 
     def clean(self):
-        cleaned_data = super(DoMailoutForm, self).clean()
+        cleaned_data = super().clean()
         if cleaned_data["action"] == DoMailoutForm.ACTION_SEND_TEST and "test_recipient" in cleaned_data and cleaned_data["test_recipient"] == "":
             self.add_error("test_recipient", "Recipient required for test emails")
         return cleaned_data

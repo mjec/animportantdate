@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static compress %}
+{% block html_head %}
+<style>
+.row {
+  display: grid;
+  grid-template-columns: 1fr 3fr 6fr 1fr;
+}
+</style>
+{% endblock html_head %}
+{% block content %}
+<h1>{{ what }}s</h1>
+
+<div class="row header">
+  <p>Added</p>
+  <p>Who</p>
+  <p>Why</p>
+  <p>Sent</p>
+</div>
+
+{% for nts in object_list %}
+<form action="{% url 'mark_as_sent' %}" method="get">
+<div class="row" id="row-{{ forloop.counter }}">
+  <input type="hidden" name="row" value="row-{{ forloop.counter }}">
+  <input type="hidden" name="nts" value="{{ nts.pk }}">
+  <p class="td" data-header="Added">{{ nts.added }}</p>
+  <p class="td" data-header="Who"><a href="{% url 'admin:wedding_group_change' nts.who.pk %}">{{ nts.who }}</a></p>
+  <p class="td" data-header="Why">{{ nts.why }}</p>
+  <p class="td" data-header="Sent">{{ nts.sent|default_if_none:'<button type="submit">Mark as sent</button>' }}</p>
+</div>
+</form>
+{% endfor %}
+
+
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends "admin/index.html" %}
+{% load i18n admin_urls wedding %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module">
+        <h2>Quick summary</h2>
+        <h3>Need to send</h3>
+        <ul>
+          <li><a href="{% url 'invitations' %}">Invitations</a> ({% outstanding_invitations %})</li>
+          <li><a href="{% url 'thanks' %}">Thank you cards</a> ({% outstanding_thankyou_cards %})</li>
+          <li><a href="{% url 'save_the_date' %}">Save the dates</a> ({% outstanding_save_the_dates %})</li>
+        </ul>
+    </div>
+</div>
+{% endblock sidebar %}

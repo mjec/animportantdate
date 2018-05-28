@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 <div id="gallery">
   {% for photo in photos %}
-    {% thumbnail photo.image "100x100" crop="center" as thumb %}
+    {% thumbnail photo.image "150x150" crop="center" as thumb %}
     <a href="{{ photo.image.url }}" data-sub-html=".caption">
       <img src="{{ thumb.url }}" width="{{ thumb.width }}" height="{{ thumb.height }}">
       <div class="caption">

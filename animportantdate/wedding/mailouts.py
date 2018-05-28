@@ -20,13 +20,17 @@ class Message(MessageBase):
 
 class MailoutHelper(object):
 
-    def __init__(self, mailout, recipients, override_recipient=None, attach_images=True, mark_as_sent=None):
+    def __init__(self, mailout, recipients, override_recipient=None, attach_images=True, mark_as_sent=None, only_if_unsent=False):
         self.override_recipient = override_recipient
         self._mailout = mailout
-        self._recipients = recipients
+        if mark_as_sent is not None and only_if_unsent:
+            self._recipients = recipients.filter(group__needtosend__sent__isnull=True, group__needtosend__what=mark_as_sent)
+        else:
+            self._recipients = recipients
         self.image_attachments = []
         self.attach_images = attach_images
         self.mark_as_sent = mark_as_sent
+        self.only_if_unsent = only_if_unsent
         if attach_images and mailout.html_body != "":
             for img in mailout.images.all():
                 mime_image = MIMEImage(img.file.read())
@@ -74,11 +78,13 @@ class MailoutHelper(object):
 
                     email_message.send()
                     if self.override_recipient is None:
-                        sent.append(models.MailSent(
+                        sent_mail = models.MailSent(
                             mailout=self._mailout,
                             recipient=message.recipient,
                             open_key=message.open_key
-                        ))
+                        )
+                        sent_mail.save()
+                        sent.append(sent_mail)
         finally:
             models.MailSent.objects.bulk_create(sent)
             if self.mark_as_sent:

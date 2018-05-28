@@ -1,18 +1,12 @@
 from . import forms
 from . import mail_alerts
-from . import mailouts
 from . import models
 
 from django.forms import modelformset_factory
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
-from django.core.mail import mail_managers
 from django.shortcuts import redirect, render, reverse
 from django.utils import timezone
 
-
-
-# Create your views here.
 
 def index(request):
 
@@ -157,65 +151,3 @@ def page_not_found(request):
     }
 
     return render(request, "wedding/pages/error404.html", data, status=404)
-
-
-@staff_member_required
-def mailout(request, mailout_id):
-
-    mailout_id = int(mailout_id)
-
-    mailout = models.Mailout.objects.get(id=mailout_id)
-
-    people_already_sent_id = models.MailSent.objects.filter(mailout=mailout).values('recipient__id').distinct()
-    # groups_eligible = mailout.event.group_set.all()
-    people_eligible = models.Person.objects.filter(group__events=mailout.event, email__isnull=False).exclude(email='')
-
-    initial = {
-        "people": people_eligible.exclude(id__in=people_already_sent_id),
-    }
-
-    form = forms.DoMailoutForm(
-        request.POST or None,
-        prefix="mailout",
-        initial=initial,
-    )
-
-    # Restrict the people who appear to the people who are eligible
-    form.fields["people"].queryset = people_eligible
-
-    data = {
-        "mailout": mailout,
-        "mailout_form": form,
-        "body_class": "mailout",
-    }
-
-    if request.POST and form.is_valid():
-        test_recipient = None
-        m = None
-
-        send = form.cleaned_data["action"] == forms.DoMailoutForm.ACTION_SEND_MAIL or form.cleaned_data["action"] == forms.DoMailoutForm.ACTION_SEND_TEST
-
-        if form.cleaned_data["action"] == forms.DoMailoutForm.ACTION_SEND_TEST:
-            test_recipient = form.cleaned_data["test_recipient"]
-        
-        try:
-            m = mailouts.MailoutHelper(mailout, form.cleaned_data["people"], test_recipient, send, form.cleaned_data["mark_as_sent"])
-            data["mailouts"] = m.messages
-        except Exception as e:
-            messages.error(request, str(e))
-
-        if m is not None and send:
-            try:
-                m.send_messages()
-
-                if test_recipient is None:
-                    messages.success(request, "The messages have been sent successfully")
-                    return redirect('admin:{}_{}_change'.format(mailout._meta.app_label, mailout._meta.model_name), mailout.id)
-                else:
-                    messages.success(request, "Test messages have been sent successfully to {}".format(test_recipient))
-                    return redirect('mailout', mailout.id)
-
-            except Exception as e:
-                messages.error(request, str(e))
-
-    return render(request, "wedding/mailout_form.html", data)
