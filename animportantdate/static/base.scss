@@ -249,7 +249,7 @@ body {
   }
   
   .row:not(.header):hover {
-    background-color: rgba(255, 255, 255, 0.75);
+    background-color: $accent-light-17;
   }
   .row.header {
     font-weight: bold;
@@ -275,6 +275,11 @@ body {
   body {
     header {
       display: none;
+    }
+    a,
+    a:link,
+    a:visited {
+      color: $primary-color;
     }
   }
 }
