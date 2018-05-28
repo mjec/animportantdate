@@ -31,7 +31,7 @@ class Group(models.Model):
 
     @property
     def address(self):
-        fields = filter(lambda x: x, [self.address_1, self.address_2, self.address_city, self.address_state_province, self.address_postal_code, self.address_country.name])
+        fields = filter(lambda x: x, [self.address_1, self.address_2, self.address_city, self.address_state_province, self.address_postal_code, self.address_country.name if self.address_country.code != 'US' else ''])
         return "\n".join(fields).strip()
 
     @classmethod
