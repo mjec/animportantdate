@@ -77,7 +77,7 @@ class NeedToSendView(UserPassesTestMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.filter(what=self.what).order_by('added', 'sent', 'sent', 'who__display_name')
+        qs = qs.filter(what=self.what).order_by('-sent', 'added', 'who__display_name')
         return qs
 
     def test_func(self):
