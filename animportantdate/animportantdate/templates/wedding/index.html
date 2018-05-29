@@ -124,16 +124,36 @@ main {
   background-image: url({% static 'images/beard-part.jpg' %});
 }
 
-@media (max-width: 40em) {
-  .auth-form {
-    margin: 0;
+@media (max-width: 600px) {
+  .heading {
+    width: auto;
   }
   .splash-square {
-    grid-template-columns: 200px 200px;
-    grid-template-rows: 200px 200px;
-    -ms-grid-template-columns: 200px 200px;
-    -ms-grid-template-rows: 200px 200px;
+    grid-template-columns: 150px 150px;
+    grid-template-rows: 150px 150px;
+    -ms-grid-template-columns: 150px 150px;
+    -ms-grid-template-rows: 150px 150px;
   }
+  .splash-square div a:link,
+  .splash-square div a:visited,
+  .splash-square div a:focus,
+  .splash-square div a:hover {
+    height: 150px;
+    width: 150px;
+    line-height: 150px;
+  }
+  .splash-square div a:focus .hover,
+  .splash-square div a:hover .hover {
+    display: block;
+    font-size: 30px;
+  }
+  .auth-form {
+    margin: 1ex 0;
+  }
+}
+
+@media (max-width: 40em) {
+
 }
 </style>
 {% endblock %}
