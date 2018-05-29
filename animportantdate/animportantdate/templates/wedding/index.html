@@ -119,9 +119,11 @@ main {
 }
 .curls {
   background-image: url({% static 'images/curls-part.jpg' %});
+  background-size: cover;
 }
 .beard {
   background-image: url({% static 'images/beard-part.jpg' %});
+  background-size: cover;
 }
 
 @media (max-width: 600px) {
@@ -142,18 +144,17 @@ main {
     width: 150px;
     line-height: 150px;
   }
+  .splash-square div a:link .normal,
+  .splash-square div a:visited .normal {
+    font-size: 75px;
+  }
   .splash-square div a:focus .hover,
   .splash-square div a:hover .hover {
-    display: block;
     font-size: 30px;
   }
   .auth-form {
     margin: 1ex 0;
   }
-}
-
-@media (max-width: 40em) {
-
 }
 </style>
 {% endblock %}
