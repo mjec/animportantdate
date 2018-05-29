@@ -4,76 +4,85 @@
 
 {% block html_head %}
 <style>
-.parent {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: flex-start;
+h2 {
+  margin-bottom: 0;
 }
-.text p {
-  margin: 0 0 1ex 0;
+h2 + p {
+  margin-top: 0;
 }
-.images {
-  width: 210px;
-}
-.images img {
+img {
   width: 200px;
   margin-right: 10px;
   border-radius: 1em;
+  margin: 0 1ex;
+  padding: 0;
+}
+.img {
+  padding: 0;
+  margin: 0;
+}
+.left {
+  float: left;
+}
+.right {
+  float: right;
 }
 @media (max-width: 450px) {
-  .parent {
-    flex-flow: row wrap;
-    justify-content: center;
+  .left, .right {
+    float: none;
+  }
+  img {
+    clear: right;
   }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-
 <h1>
   <span class="replace-on-hover" data-replacement-text="Curls" data-original-text="Michelle"></span>
     +
   <span class="replace-on-hover" data-replacement-text="Beard" data-original-text="Michael"></span>
 </h1>
 
-<div>
-  <h2>Curls</h2>
-  <p>
-    Since 2012, Michelle had been working as a Cantor (AKA Professional Jew who also sings) in Westfield NJ,
-    while living in Jersey City. Her hobbies included long bike rides listening to sad early 00s alternative,
-    telling it like it is, and genre television. She probably couldn't find Tasmania on a map.
-  </p>
-</div>
+<p role="presentation" class="img left"><img src="{% static "images/curls.jpg" %}" alt="" role="presentation"></p>
+<h2>Curls</h2>
+<p>
+  Since 2012, Michelle had been working as a Cantor (AKA Professional Jew who also sings) in Westfield NJ,
+  while living in Jersey City. Her hobbies included long bike rides listening to sad early 00s alternative,
+  telling it like it is, and genre television. She probably couldn't find Tasmania on a map.
+</p>
 
-<div>
-  <h2>Beard</h2>
-  <p>
-    At the beginning of 2016, Michael was unhappily working as a lawyer in Tasmania,
-    Australia. His solution was to quit his job and move 10,000 miles to New York to
-    play with computers. As soon as he tried a real New York bagel he was hooked, and
-    he now works as a software engineer for <a href="https://www.etsy.com/">Etsy</a>
-    in Brooklyn.</p>
-</div>
+<p role="presentation" class="img right"><img src="{% static "images/beard.jpg" %}" alt="" role="presentation"></p>
+<h2>Beard</h2>
+<p>
+  At the beginning of 2016, Michael was unhappily working as a lawyer in Tasmania,
+  Australia. His solution was to quit his job and move 10,000 miles to New York to
+  play with computers. As soon as he tried a real New York bagel he was hooked, and
+  he now works as a software engineer for <a href="https://www.etsy.com/">Etsy</a>
+  in Brooklyn.
+</p>
 
+<div style="clear: both">
+<p role="presentation" class="img left"><img src="{% static "images/engaged.jpg" %}" alt="" role="presentation"></p>
 <h2>Curls + Beard</h2>
-<div class="parent">
-  <div class="images">
-    <img src="{% static "images/engaged.jpg" %}" alt="" role="presentation">
-  </div>
-  <div class="text">
-    <p>
-      Michelle and Michael met on OKCupid in late 2016. Our first date was lunch at a diner
-      (Michael had french toast, Michelle had an omelette and rye toast), after which we
-      saw Rogue One. We both left the date feeling pretty great; and three days later Michael
-      left the country for a month.</p>
-    <p>We stayed in touch while Michael was in Australia, and were both impatient
-      to spend more time together. Together we visited diners, gardens, art
-      galleries, museums, beaches and a pinball arcade, before moving in together
-      in August of 2017.</p>
-    <p>After managing to keep the ring hidden for nearly a month, Michael finally
-      proposed on 29 March 2018. To everyone's great relief, Michelle said yes.</p>
-  </div>
+<p>
+  Michelle and Michael met on OKCupid in late 2016. Our first date was lunch at a diner
+  (Michael had french toast, Michelle had an omelette and rye toast), after which we
+  saw Rogue One. We both left the date feeling pretty great; and three days later Michael
+  left the country for a month.
+</p>
+<p>We stayed in touch while Michael was in Australia, and were both impatient
+  to spend more time together. Together we visited diners, gardens, art
+  galleries, museums, beaches and a pinball arcade, before moving in together
+  in August of 2017.
+</p>
+<p>After managing to keep the ring hidden for nearly a month, Michael finally
+  proposed on 29 March 2018. To everyone's great relief, Michelle said yes.
+</p>
 </div>
+
+<!-- extend the background to below the image -->
+<p style="clear: both;" role="presentation"></p>
     
 {% endblock %}

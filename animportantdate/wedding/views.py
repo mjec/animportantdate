@@ -10,9 +10,6 @@ from django.utils import timezone
 
 def index(request):
 
-    if get_group(request):
-        return guest_details(request)
-
     auth_form = forms.AuthForm(
         request.GET or None,
         prefix="auth",
@@ -52,6 +49,8 @@ def guest_login(request, pnr, open_key):
 def guest_details(request):
 
     group = get_group(request)
+    if group is None:
+        return redirect(reverse('details'))
 
     group_form = forms.GroupForm(
         request.POST or None,

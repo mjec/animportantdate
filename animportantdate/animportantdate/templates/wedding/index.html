@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% comment %}
 {% load static %}
 
 {% block content %}
@@ -19,4 +19,145 @@
       <button type="submit">Continue <i class="fas fa-chevron-circle-right"></i></button>
     </p>
   </form>
+{% endblock %}
+{% endcomment %}
+{% load static %}
+
+{% block html_head %}
+<style>
+main {
+  background-color: transparent !important;
+}
+.heading {
+  text-align: center;
+  width: 40em;
+  margin: auto;
+}
+.heading h1 {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 1ex 0;
+}
+.auth-form {
+  background-color: rgba(255, 255, 255, 0.7);
+  justify-content: center;
+  padding: 0 1em;
+  margin: 1ex 6em;
+}
+.splash-square {
+  display: grid;
+  grid-template-columns: 300px 300px;
+  grid-template-rows: 300px 300px;
+  justify-content: center;
+  align-items: center;
+  
+  display: -ms-grid;
+  -ms-grid-template-columns: 300px 300px;
+  -ms-grid-template-rows: 300px 300px;
+  -ms-justify-content: center;
+  -ms-align-items: center;
+
+  text-align: center;
+}
+.splash-square div {
+  padding: 0;
+  margin: 0;
+  font-family: Courier, 'Courier New', monospace;
+  font-weight: regular;
+}
+.splash-square div * {
+  width: 100%;
+  height: 100%;
+}
+.splash-square div.yellow a:link,
+.splash-square div.yellow a:visited {
+  background-color: transparent;
+}
+.splash-square div.blue a:link,
+.splash-square div.blue a:visited {
+  background-color: rgba(170, 240, 209, 0.9);
+}
+
+.splash-square div.yellow a:focus,
+.splash-square div.yellow a:hover {
+  background-color: rgba(234, 218, 159, 0.9);
+}
+.splash-square div.blue a:focus,
+.splash-square div.blue a:hover {
+  background-color: rgba(170, 240, 209, 0.6);
+}
+
+.splash-square div a:link,
+.splash-square div a:visited,
+.splash-square div a:focus,
+.splash-square div a:hover {
+  color: #000000;
+  height: 300px;
+  width: 300px;
+  display: block;
+  line-height: 300px;
+  transition: all 1s;
+}
+
+.splash-square div a:link .normal,
+.splash-square div a:visited .normal {
+  display: block;
+  font-size: 150px;
+}
+.splash-square div a:focus .normal,
+.splash-square div a:hover .normal {
+  display: none;
+}
+
+.splash-square div a:link .hover,
+.splash-square div a:visited .hover {
+  display: none;
+}
+.splash-square div a:focus .hover,
+.splash-square div a:hover .hover {
+  display: block;
+  font-size: 40px;
+}
+.curls {
+  background-image: url({% static 'images/curls-part.jpg' %});
+}
+.beard {
+  background-image: url({% static 'images/beard-part.jpg' %});
+}
+
+@media (max-width: 40em) {
+  .auth-form {
+    margin: 0;
+  }
+  .splash-square {
+    grid-template-columns: 200px 200px;
+    grid-template-rows: 200px 200px;
+    -ms-grid-template-columns: 200px 200px;
+    -ms-grid-template-rows: 200px 200px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="heading">
+  <h1>
+    <span class="replace-on-hover" data-replacement-text="Curls + Beard" data-original-text="Michelle + Michael"></span>
+  </h1>
+</div>
+
+<div class="splash-square">
+  <div class="curls yellow"><a href="{% if request.session.confirmation_code %}{% url 'guest-details' %}{% else %}{% url 'details' %}{% endif %}"><span class="normal">&nbsp;</span><span class="hover">Details</span></a></div>
+  <div class="m blue"><a href="{% url 'story' %}"><span class="normal">M</span><span class="hover">Story</span></a></div>
+  <div class="m blue"><a href="{% url 'gifts' %}"><span class="normal">M</span><span class="hover">Gifts</span></a></div>
+  <div class="beard yellow"><a href="{% url 'photos' %}"><span class="normal">&nbsp;</span><span class="hover">Photos</span></a></div>
+</div>
+
+{% if not request.session.confirmation_code %}
+<form method="GET" class="auth-form">
+  {{ auth_form.as_p }}
+  <p>
+    <button type="submit">Continue <i class="fas fa-chevron-circle-right"></i></button>
+  </p>
+</form>
+{% endif %}
 {% endblock %}
