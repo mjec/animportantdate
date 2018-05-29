@@ -37,9 +37,7 @@ Code for this site is available at https://github.com/mjec/animportantdate/.
         <input id="menu-expander" type="checkbox" aria-hidden=”true” role=”presentation”>
         <ul>
           <li id="menu-expander-label"><label for="menu-expander" aria-hidden=”true” role=”presentation”><i class="fas fa-bars"></i>&nbsp;Menu</label></li>
-          {% if not request.session.confirmation_code %}
           <li class="home"><a href="{% url 'home' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-home"></i>&nbsp;<span class="text">Home</span></a></li>
-          {% endif %}
           <li class="story"><a href="{% url 'story' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-heart"></i>&nbsp;<span class="text">Our Story</span></a></li>
           {% if request.session.confirmation_code %}
           <li class="guest"><a href="{% url 'guest-details' %}"><i data-fa-transform="shrink-4" class="fas fa-xs fa-fw fa-user-circle"></i>&nbsp;<span class="text">Your Details</span></a></li>
