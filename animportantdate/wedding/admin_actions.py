@@ -7,7 +7,7 @@ def mark_as_sent_today(modeladmin, request, queryset):
 mark_as_sent_today.short_description = 'Mark as sent today'
 
 def build_need_to_send(what):
-    def need_to_send(what, modeladmin, request, queryset):
+    def need_to_send(modeladmin, request, queryset):
         need_to_sends = []
         for group in queryset:
             need_to_sends.append(NeedToSend(
