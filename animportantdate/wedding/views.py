@@ -30,7 +30,7 @@ def index(request):
     return render(request, "wedding/index.html", data)
 
 
-def guest_login(request, pnr, open_key):
+def guest_login(request, pnr, open_key, destination='details'):
     try:
         group = authenticate(request, pnr)
         try:
@@ -40,7 +40,10 @@ def guest_login(request, pnr, open_key):
             group.add_note('Email {} opened'.format(email.mailout))
         except:
             pass
-        return redirect(guest_details)
+        if destination == 'index':
+            return redirect(index)
+        else:
+            return redirect(guest_details)
     except models.Group.DoesNotExist:
         base_url = reverse(index) + "?auth-pnr=%s" % pnr
         return redirect(base_url)

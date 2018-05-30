@@ -5,6 +5,7 @@ register_converter(path_converters.PnrConverter, 'pnr')
 
 urlpatterns = [
     path('guest/<pnr:pnr>/<pnr:open_key>', views.guest_login),
+    path('guest/<pnr:pnr>/<pnr:open_key>/<str:destination>', views.guest_login),
     path('guest', views.guest_details, name='guest-details'),
     path('details', views.content_page, {"page_name": "detail"}, name='details'),
     path('photos', views.photos, name='photos'),
