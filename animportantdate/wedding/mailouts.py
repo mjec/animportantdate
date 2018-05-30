@@ -86,7 +86,6 @@ class MailoutHelper(object):
                         sent_mail.save()
                         sent.append(sent_mail)
         finally:
-            models.MailSent.objects.bulk_create(sent)
             if self.mark_as_sent:
                 models.NeedToSend.objects.filter(who__in=[r.recipient.group.pk for r in sent], what=self.mark_as_sent, sent__isnull=True).update(sent=timezone.now(), sent_note='Sent by email')
 
