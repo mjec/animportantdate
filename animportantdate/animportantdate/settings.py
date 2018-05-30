@@ -233,7 +233,7 @@ EMAIL_SUBJECT_PREFIX = "[Wedding] "
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-COUNTRIES_ONLY = ['US' ,'AU', 'NZ', 'IL', 'GB']
+COUNTRIES_ONLY = ['US' ,'AU', 'NZ', 'IL', 'GB', 'FR', 'CA']
 
 if "EMAIL_HOST" in os.environ and "EMAIL_USER" in os.environ and "EMAIL_PASSWORD" in os.environ:
     EMAIL_HOST = os.environ["EMAIL_HOST"]
