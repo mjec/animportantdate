@@ -7,7 +7,10 @@ from django.contrib import messages
 from django.shortcuts import redirect, render, reverse
 from django.utils import timezone
 
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import never_cache, cache_control, patch_cache_control
 
+@vary_on_cookie
 def index(request):
 
     auth_form = forms.AuthForm(
@@ -27,9 +30,15 @@ def index(request):
         "body_class": "home",
     }
 
-    return render(request, "wedding/index.html", data)
+    response = render(request, "wedding/index.html", data)
+    if request.GET:
+        patch_cache_control(response, private=True, max_age=60)
+    else:
+        patch_cache_control(response, public=True, max_age=3600)
+    return response
 
 
+@never_cache
 def guest_login(request, pnr, open_key, destination='details'):
     try:
         group = authenticate(request, pnr)
@@ -49,6 +58,7 @@ def guest_login(request, pnr, open_key, destination='details'):
         return redirect(base_url)
 
 
+@never_cache
 def guest_details(request):
 
     group = get_group(request)
@@ -127,6 +137,8 @@ def get_group(request):
         return None
 
 
+@vary_on_cookie
+@cache_control(max_age=3600, public=True)
 def content_page(request, page_name=None):
     data = {
         "body_class": page_name,
@@ -136,6 +148,8 @@ def content_page(request, page_name=None):
     return render(request, "wedding/pages/%s.html" % page_name, data)
 
 
+@vary_on_cookie
+@cache_control(max_age=3600, public=True)
 def photos(request):
     data = {
         "body_class": "photos",
@@ -146,6 +160,8 @@ def photos(request):
     return render(request, "wedding/pages/photos.html", data)
 
 
+@vary_on_cookie
+@cache_control(max_age=3600, public=True)
 def page_not_found(request):
     data = {
         "body_class": "error404",
