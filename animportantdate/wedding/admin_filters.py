@@ -56,6 +56,21 @@ class Opened(admin.SimpleListFilter):
         return queryset.filter(mailsent__mailout=self.value(), mailsent__last_opened__isnull=False)
 
 
+class HasNotOpened(admin.SimpleListFilter):
+    title = 'has not opened'
+    parameter_name = 'has_not_opened'
+
+    def lookups(self, request, model_admin):
+        return [
+            (mailout.pk, mailout.name) for mailout in models.Mailout.objects.all()
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() is None:
+            return queryset
+        return queryset.filter(mailsent__mailout=self.value(), mailsent__last_opened__isnull=True)
+
+
 class RSVPFilter(admin.SimpleListFilter):
     title = 'RSVP'
     parameter_name = 'rsvp'
