@@ -58,7 +58,7 @@ class NeedToSendAdmin(admin.ModelAdmin):
 class PersonAdmin(admin.ModelAdmin):
     list_display = ('name', 'group_link', 'rsvp_status')
     list_display_links = ('name', )
-    list_filter = ('rsvp_status', WasSent, Opened)
+    list_filter = ('rsvp_status', WasSent, Opened, HasNotOpened)
     list_per_page = 200
     search_fields = ('name', 'group__display_name', 'group__pnr')
     autocomplete_fields = ('group',)
