@@ -7,11 +7,10 @@
 
 {% if not request.session.confirmation_code %}
 <p>To see details about the invite-only events, enter the confirmation code we sent on the
-  <a href="/">home</a> page.
+  <a href="{% url 'home' %}">home</a> page.
 </p>
 {% else %}
-<p>Check back later for more details about the invite-only events including date, time,
-  and location as well as travel and lodging advice. Make sure to keep <a href="/guest">your information</a> up
+<p>Make sure to keep <a href="{% url 'guest-details' %}">your information</a> up
   to date so we can stay in touch with you.</p>
 
 {% for event in group.events.all %}
