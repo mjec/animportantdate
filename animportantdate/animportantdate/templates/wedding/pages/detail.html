@@ -16,7 +16,9 @@
 {% for event in group.events.all %}
 <div>
   <h2>{{ event.name }}<br><small>{{ event.date_time }} at <a href="{{ event.directions_url }}">{{ event.venue }}</a></small></h2>
+  {% autoescape off %}
   {{ event.description|linebreaks }}
+  {% endautoescape %}
 </div>
 {% endfor %}
 

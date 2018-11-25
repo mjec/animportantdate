@@ -172,7 +172,8 @@ class Event(models.Model):
     venue = models.CharField(max_length=255)
     address = models.TextField()
     directions_url = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(
+        help_text="HTML is allowed, but paragraph tags will be automatically inserted")
 
 
 class DetailsSection(models.Model):
