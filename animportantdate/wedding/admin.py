@@ -1,3 +1,4 @@
+from admin_ordering.admin import OrderableAdmin
 from django.contrib import admin
 from django.shortcuts import reverse
 from django.utils.safestring import mark_safe
@@ -14,6 +15,7 @@ from .admin_actions import *
 from .admin_inlines import *
 from .admin_filters import *
 
+
 class AdminSite(admin.AdminSite):
     site_header = 'Curls & Beard'
     site_title = 'Curls & Beard'
@@ -26,11 +28,10 @@ site = AdminSite(name='admin')
 class EventAdmin(admin.ModelAdmin):
     model = models.Event
     list_display = ('name', 'invited', 'attending', 'declined', 'no_response')
-    
-    inlines = [
-        GroupInline,
-    ]
 
+    inlines = [
+        GroupInlineForEvents,
+    ]
 
 
 @admin.register(models.NeedToSend, site=site)
@@ -40,7 +41,8 @@ class NeedToSendAdmin(admin.ModelAdmin):
     list_display_links = ('why', 'what', 'added', 'sent')
     list_filter = ('what', 'sent', 'added', AddedBeforeListFilter)
     list_per_page = 200
-    search_fields = ('why', 'who__person__name', 'who__display_name', 'who__pnr')
+    search_fields = ('why', 'who__person__name',
+                     'who__display_name', 'who__pnr')
     empty_value_display = '(Not yet)'
     autocomplete_fields = ('who',)
     actions = [mark_as_sent_today]
@@ -51,7 +53,6 @@ class NeedToSendAdmin(admin.ModelAdmin):
                 url=reverse("admin:wedding_group_change", args=(obj.who.pk,)),
                 display_name=escape(obj.who.display_name)))
     who_link.short_description = "Who"
-
 
 
 @admin.register(models.Person, site=site)
@@ -70,20 +71,23 @@ class PersonAdmin(admin.ModelAdmin):
     def group_link(self, obj):
         return mark_safe(
             '<a href="{url}">{display_name}</a>'.format(
-                url=reverse("admin:wedding_group_change", args=(obj.group.pk,)),
+                url=reverse("admin:wedding_group_change",
+                            args=(obj.group.pk,)),
                 display_name=escape(obj.group.display_name)))
     group_link.short_description = "Group"
 
 
 @admin.register(models.Group, site=site)
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ('display_name', 'invited', 'attending', 'declined', 'no_response')
+    list_display = ('display_name', 'invited',
+                    'attending', 'declined', 'no_response')
     list_filter = (RSVPFilter, 'events')
     search_fields = ('display_name', 'pnr', 'person__name')
     actions = [
         need_to_send_save_the_date,
         need_to_send_invitation,
         need_to_send_thankyou_card,
+        add_details_section,
     ]
 
     formfield_overrides = {
@@ -103,7 +107,8 @@ class MailoutAdmin(admin.ModelAdmin):
     list_display = ('name', 'event_link', 'subject', 'sent_to', 'opened_by')
     list_display_links = ('name', 'subject')
     list_filter = ('event', 'subject')
-    search_fields = ('name', 'event__short_name', 'event__name', 'subject', 'plain_body')
+    search_fields = ('name', 'event__short_name',
+                     'event__name', 'subject', 'plain_body')
 
     inlines = [
         MailoutImageInline,
@@ -122,12 +127,11 @@ class MailoutAdmin(admin.ModelAdmin):
     def event_link(self, obj):
         return mark_safe(
             '<a href="{url}">{display_name}</a>'.format(
-                url=reverse("admin:wedding_event_change", args=(obj.event.pk,)),
+                url=reverse("admin:wedding_event_change",
+                            args=(obj.event.pk,)),
                 display_name=escape(obj.event.name)))
     event_link.short_description = "Event"
 
-
-from admin_ordering.admin import OrderableAdmin
 
 @admin.register(models.Photo, site=site)
 class PhotoAdmin(AdminImageMixin, OrderableAdmin, admin.ModelAdmin):
@@ -136,6 +140,19 @@ class PhotoAdmin(AdminImageMixin, OrderableAdmin, admin.ModelAdmin):
     list_display_links = ('__str__', 'description',)
     search_fields = ('name', 'description',)
     ordering_field = 'order'
+
+
+@admin.register(models.DetailsSection, site=site)
+class DetailsSectionAdmin(OrderableAdmin, admin.ModelAdmin):
+    list_display = ('heading', 'order',)
+    list_editable = ('order',)
+    list_display_links = ('heading', )
+    search_fields = ('heading', 'description',)
+    ordering_field = 'order'
+
+    inlines = [
+        GroupInlineForDetailsSections,
+    ]
 
 
 site.register(models.SiteConfiguration, SingletonModelAdmin)

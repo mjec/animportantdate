@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import never_cache, cache_control, patch_cache_control
 
+
 @vary_on_cookie
 def index(request):
 
@@ -70,25 +71,41 @@ def guest_details(request):
         instance=group,
         prefix="group",
     )
-    #
-    # people_in_group = group.person_set.count()
-    #
-    # PersonFormset = modelformset_factory(
-    #     models.Person,
-    #     # form=SomeForm
-    #     fields=('name', 'email', 'rsvp_status', 'dietary_restrictions'),
-    #     extra=0,
-    #     min_num=people_in_group, max_num=people_in_group,
-    #     validate_min=True, validate_max=True
-    # )
-    #
-    # person_formset = PersonFormset(
-    #     request.POST or None,
-    #     queryset=group.person_set.all(),
-    #     prefix="people"
-    # )
 
-    if request.POST and group_form.is_valid(): # and person_formset.is_valid():
+    people_in_group = group.person_set.count()
+
+    if models.SiteConfiguration.get_solo().accepting_rsvps:
+        person_formset_fields = (
+            'name', 'email', 'dietary_restrictions', 'rsvp_status', )
+    else:
+        person_formset_fields = ('name', 'email', 'dietary_restrictions', )
+
+    def formfield_callback_method(field, **kwargs):
+        formfield = field.formfield(**kwargs)
+        if field.name == 'rsvp_status':
+            # We want to prohibit folks from saving a non-RSVP
+            formfield.choices = [
+                c for c in models.Person.RSVP_CHOICES if c[0] != models.Person.RSVP_UNKNOWN]
+        return formfield
+
+    PersonFormset = modelformset_factory(
+        models.Person,
+        fields=person_formset_fields,
+        formfield_callback=formfield_callback_method,
+        extra=0,
+        min_num=people_in_group,
+        max_num=people_in_group,
+        validate_min=True,
+        validate_max=True
+    )
+
+    person_formset = PersonFormset(
+        request.POST or None,
+        queryset=group.person_set.all(),
+        prefix="people"
+    )
+
+    if request.POST and group_form.is_valid() and person_formset.is_valid():
         address_changed = False
         if group_form.has_changed():
             if models.Group.contains_address_field(group_form.changed_data):
@@ -96,25 +113,28 @@ def guest_details(request):
                 changed_fields_string = ', '.join(group_form.changed_data)
         group_form.save()
         if address_changed:
-            new_invitation_required = models.NeedToSend.objects.filter(who=group, what=models.NeedToSend.INVITATION, sent__isnull=True).count() == 0
+            new_invitation_required = models.NeedToSend.objects.filter(
+                who=group, what=models.NeedToSend.INVITATION, sent__isnull=True).count() == 0
             if new_invitation_required:
-                group.add_note("Contact details updated ({}) but invitation sent; creating new need to send invitation".format(changed_fields_string))
+                group.add_note("Contact details updated ({}) but invitation sent; creating new need to send invitation".format(
+                    changed_fields_string))
                 models.NeedToSend.objects.create(
                     who=group,
                     what=models.NeedToSend.INVITATION,
                     why="Address changed"
                 )
             else:
-                group.add_note("Contact details updated ({}); invitation not yet sent".format(changed_fields_string))
-            mail_alerts.group_contact_update(group, changed_fields_string, new_invitation_required)
-            # person_formset.save()
+                group.add_note("Contact details updated ({}); invitation not yet sent".format(
+                    changed_fields_string))
+            mail_alerts.group_contact_update(
+                group, changed_fields_string, new_invitation_required)
+            person_formset.save()
         messages.success(request, "Thank you! We've got your contact details.")
         return redirect(guest_details)
-        
 
     data = {
         "group_form": group_form,
-        # "person_formset": person_formset,
+        "person_formset": person_formset,
         "group": group,
         "body_class": "guest",
     }

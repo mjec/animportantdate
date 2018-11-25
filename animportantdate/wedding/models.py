@@ -6,6 +6,7 @@ from sorl.thumbnail import ImageField
 
 from .fields import PnrField
 
+
 class Group(models.Model):
     ''' A group is an organisation that receives an invitation. '''
 
@@ -14,10 +15,10 @@ class Group(models.Model):
 
     def invited(self):
         return 0 if self.events.count() == 0 else self.person_set.count()
-    
+
     def attending(self):
         return 0 if self.events.count() == 0 else self.person_set.filter(rsvp_status=Person.RSVP_ATTENDING).count()
-    
+
     def declined(self):
         return 0 if self.events.count() == 0 else self.person_set.filter(rsvp_status=Person.RSVP_NOT_ATTENDING).count()
 
@@ -27,12 +28,19 @@ class Group(models.Model):
     def add_note(self, content):
         self.notes.create(content=content)
 
-    address_fields = ('address_1', 'address_2', 'address_city', 'address_state_province', 'address_postal_code', 'address_country')
+    address_fields = ('address_1', 'address_2', 'address_city',
+                      'address_state_province', 'address_postal_code', 'address_country')
 
     @property
     def address(self):
-        fields = filter(lambda x: x, [self.address_1, self.address_2, self.address_city, self.address_state_province, self.address_postal_code, self.address_country.name if self.address_country.code != 'US' else ''])
+        fields = filter(lambda x: x, [self.address_1, self.address_2, self.address_city, self.address_state_province,
+                                      self.address_postal_code, self.address_country.name if self.address_country.code != 'US' else ''])
         return "\n".join(fields).strip()
+
+    @property
+    def rsvp_summary(self):
+        return "; ".join([p.name + " - " + Person.friendly_rsvp_status(p.rsvp_status)
+                          for p in self.person_set.all()])
 
     @classmethod
     def contains_address_field(cls, field_list):
@@ -79,7 +87,7 @@ class Group(models.Model):
     telephone = models.CharField(
         max_length=20,
         blank=True,
-        verbose_name = "Phone number"
+        verbose_name="Phone number"
     )
 
     display_name = models.CharField(max_length=255)
@@ -88,7 +96,13 @@ class Group(models.Model):
         blank=True,
         related_name="groups",
     )
-    
+
+    details_sections = models.ManyToManyField(
+        "DetailsSection",
+        blank=True,
+        related_name="groups",
+    )
+
     class Meta:
         ordering = ['display_name']
 
@@ -103,7 +117,7 @@ class Person(models.Model):
     RSVP_NOT_ATTENDING = 3
 
     RSVP_CHOICES = (
-        (RSVP_UNKNOWN, "No Response"),
+        (RSVP_UNKNOWN, "No response"),
         (RSVP_ATTENDING, "Attending"),
         (RSVP_NOT_ATTENDING, "Not attending"),
     )
@@ -114,23 +128,29 @@ class Person(models.Model):
     rsvp_status = models.IntegerField(
         choices=RSVP_CHOICES,
         default=RSVP_UNKNOWN,
+        verbose_name='RSVP'
     )
     dietary_restrictions = models.TextField(blank=True)
 
+    @classmethod
+    def friendly_rsvp_status(klass, rsvp_status):
+        return {c[0]: c[1] for c in klass.RSVP_CHOICES}.get(rsvp_status) or 'Unknown'
+
     class Meta:
         verbose_name_plural = "people"
+
 
 class Event(models.Model):
 
     def __str__(self):
         return self.short_name
-    
+
     def invited(self):
         return Person.objects.filter(group__events=self.pk).count()
-    
+
     def attending(self):
         return Person.objects.filter(rsvp_status=Person.RSVP_ATTENDING, group__events=self.pk).count()
-    
+
     def declined(self):
         return Person.objects.filter(rsvp_status=Person.RSVP_NOT_ATTENDING, group__events=self.pk).count()
 
@@ -155,6 +175,20 @@ class Event(models.Model):
     description = models.TextField()
 
 
+class DetailsSection(models.Model):
+    heading = models.CharField(max_length=255)
+    description = models.TextField(
+        help_text='HTML is permitted')
+    add_paragraph_tags = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.heading
+
+    class Meta:
+        ordering = ['order']
+
+
 class Mailout(models.Model):
 
     def __str__(self):
@@ -162,7 +196,7 @@ class Mailout(models.Model):
 
     def sent_to(self):
         return self.mailsent_set.count()
-        
+
     def opened_by(self):
         return self.mailsent_set.filter(last_opened__isnull=False).count()
 
@@ -176,16 +210,18 @@ class Mailout(models.Model):
 class MailoutImage(models.Model):
     slug = models.SlugField()
     file = models.ImageField()
-    mailout = models.ForeignKey(Mailout, related_name='images', on_delete=models.CASCADE)
-    
+    mailout = models.ForeignKey(
+        Mailout, related_name='images', on_delete=models.CASCADE)
+
     def __str__(self):
         return '{} for {}'.format(self.slug, self.mailout)
 
     class Meta:
         unique_together = (('slug', 'mailout'), )
 
+
 class MailSent(models.Model):
-    
+
     class Meta:
         verbose_name_plural = 'Mails sent'
 
@@ -225,7 +261,7 @@ class NeedToSend(models.Model):
         (THANKYOU_CARD, "Thank you card"),
         (SAVE_THE_DATE, "Save the date"),
     )
-    
+
     who = models.ForeignKey(Group, on_delete=models.CASCADE)
     what = models.IntegerField(choices=THINGS_TO_SEND)
     why = models.TextField()
@@ -238,7 +274,8 @@ class Note(models.Model):
     def __str__(self):
         return self.content
 
-    about = models.ForeignKey(Group, related_name='notes', on_delete=models.CASCADE)
+    about = models.ForeignKey(
+        Group, related_name='notes', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
 
@@ -254,13 +291,15 @@ class Photo(models.Model):
 
     class Meta:
         ordering = ['order']
-    
+
 
 class SiteConfiguration(SingletonModel):
     mailouts_from_name = models.CharField(max_length=60)
     mailouts_from_email = models.EmailField()
     mailouts_bcc = models.EmailField(blank=True, null=True, default=None)
     physical_address = models.TextField(blank=True)
+    accepting_rsvps = models.BooleanField(
+        default=False, verbose_name='Accepting RSVPs')
 
     @property
     def mailouts_from(self):

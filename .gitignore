@@ -108,3 +108,5 @@ db.sqlite3
 
 public/**
 uploads/**
+
+.vscode/

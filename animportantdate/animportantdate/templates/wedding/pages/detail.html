@@ -13,15 +13,27 @@
 <p>Check back later for more details about the invite-only events including date, time,
   and location as well as travel and lodging advice. Make sure to keep <a href="/guest">your information</a> up
   to date so we can stay in touch with you.</p>
-{% comment %}
+
 {% for event in group.events.all %}
 <div>
-  <h2>{{ event.name }}</h2>
-  <p>{{ event.date_time }} at <a href="{{ event.directions_url }}">{{ event.venue }}</a></p>
+  <h2>{{ event.name }}<br><small>{{ event.date_time }} at <a href="{{ event.directions_url }}">{{ event.venue }}</a></small></h2>
   {{ event.description|linebreaks }}
 </div>
 {% endfor %}
-{% endcomment %}
+
+{% for section in group.details_sections.all %}
+<div>
+  <h2>{{ section.heading }}</h2>
+  {% autoescape off %}
+    {% if section.add_paragraph_tags %}
+      {{ section.description|linebreaks }}
+    {% else %}
+      {{ section.description }}
+    {% endif %}
+  {% endautoescape %}
+</div>
+{% endfor %}
+
 {% endif %}
 
 {% endblock content %}

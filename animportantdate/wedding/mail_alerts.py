@@ -4,6 +4,7 @@ from django.core import mail
 class MailAlert(object):
 
     def send(self, **k):
+        print(self.message(**k))
         mail.mail_managers(self.subject(**k), self.message(**k), True)
 
     def subject(self, **k):
@@ -22,6 +23,8 @@ Enjoy!
 
 Group: {group.display_name}
 
+RSVPs: {group.rsvp_summary}
+
 Changed information: {fields}
 
 New invitation required: {new_invitation_required}
@@ -32,4 +35,5 @@ New invitation required: {new_invitation_required}
 
 
 def group_contact_update(group, fields, new_invitation_required):
-    GroupContactUpdate().send(group=group, fields=fields, new_invitation_required=new_invitation_required)
+    GroupContactUpdate().send(group=group, fields=fields,
+                              new_invitation_required=new_invitation_required)

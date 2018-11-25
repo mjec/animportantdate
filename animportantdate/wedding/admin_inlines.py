@@ -7,6 +7,7 @@ from django import forms
 
 from . import models
 
+
 class MailSentInline(admin.TabularInline):
     model = models.MailSent
     fields = ('recipient_link', 'datestamp', 'last_opened')
@@ -19,7 +20,8 @@ class MailSentInline(admin.TabularInline):
     def recipient_link(self, obj):
         return mark_safe(
             '<a href="{url}">{display_name}</a>'.format(
-                url=reverse("admin:wedding_person_change", args=(obj.recipient.pk,)),
+                url=reverse("admin:wedding_person_change",
+                            args=(obj.recipient.pk,)),
                 display_name=escape(obj.recipient.name)))
     recipient_link.short_description = "Who"
 
@@ -58,16 +60,35 @@ class PersonInline(admin.TabularInline):
     }
 
 
-class GroupInline(admin.TabularInline):
+class GroupInlineForEvents(admin.TabularInline):
     model = models.Event.groups.through
     fields = ('group_link', )
     readonly_fields = ('group_link',)
     extra = 0
+    max_num = 0
     verbose_name = 'invited group'
 
     def group_link(self, obj):
         return mark_safe(
             '<a href="{url}">{display_name}</a>'.format(
-                url=reverse("admin:wedding_group_change", args=(obj.group.pk,)),
+                url=reverse("admin:wedding_group_change",
+                            args=(obj.group.pk,)),
+                display_name=escape(obj.group.display_name)))
+    group_link.short_description = "Group"
+
+
+class GroupInlineForDetailsSections(admin.TabularInline):
+    model = models.DetailsSection.groups.through
+    fields = ('group_link', )
+    readonly_fields = ('group_link',)
+    extra = 0
+    max_num = 0
+    verbose_name = 'invited group'
+
+    def group_link(self, obj):
+        return mark_safe(
+            '<a href="{url}">{display_name}</a>'.format(
+                url=reverse("admin:wedding_group_change",
+                            args=(obj.group.pk,)),
                 display_name=escape(obj.group.display_name)))
     group_link.short_description = "Group"

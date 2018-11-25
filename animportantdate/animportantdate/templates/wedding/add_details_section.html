@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block html_head %}
+<style>
+select[multiple] {
+  height: 20em;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+  <h2>Add details setctions</h2>
+  <p>Use this form to show a particular details section to the selected groups. Those sections will appear in the "Where + When" section for those groups.</p>
+  <p>Note that this only adds; to remove access to a details section, use the <a href="{% url 'admin:wedding_detailssection_changelist' %}">admin panel for that detail section</a>.</p>
+  <div class="flex-form">
+    <form method="post" class="form">
+      {% csrf_token %}
+      {{ form.as_p }}
+        <button type="submit">
+          Show selected detail setctions to the groups
+        </button>
+    </form>
+  </div>
+{% endblock %}

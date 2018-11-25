@@ -1,6 +1,76 @@
 {% extends "base.html" %}
 {% load solo_tags %}
 
+{% block html_head %}
+<style>
+textarea {
+  height: 2.6em;
+}
+form td {
+  vertical-align: top;
+}
+td {
+  font-family: "Prata", serif;
+}
+
+@media only screen and (max-width: 768px) {
+    input, select, textarea {
+      width: 12em;
+      font-family: "Raleway", sans-serif;
+      font-weight: 400;
+      font-size: 1.6ex;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        border-bottom: 1px solid #ccc;
+    }
+
+    tr:last-of-type {
+      border-bottom: none;
+    }
+
+    td {
+        /* Behave  like a "row" */
+        border: none;
+        position: relative;
+        padding-left: 10em !important;
+        min-height: 2.3em;
+    }
+
+    td:before {
+        /* Now like a table header */
+        position: absolute;
+        /* Top/left values mimic padding */
+        top: 6px;
+        left: 6px;
+        width: 7em;
+        padding-right: 10px;
+        white-space: nowrap;
+    }
+
+    /*
+    Label the data
+    */
+    {% for field in person_formset.0 %}
+    {% if not field.is_hidden %}
+    td:nth-of-type({{ forloop.counter }}):before { content: "{{ field.label }}"; }
+    {% endif %}
+    {% endfor %}
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
   <h1>You’re invited!</h1>
@@ -14,39 +84,10 @@
     is a form for you to let us know the best way to contact you.</p>
   <p>If you want to get in touch directly, you can email us at
     <a href="mailto:{{ site_config.mailouts_from_email }}">{{ site_config.mailouts_from_email }}</a>.</p>
-{% comment %}
-<form method="post">
-  {% csrf_token %}
-    {{ person_formset.as_p }}
-
-  <!-- {% if group.person_set.all.count == 1 %}
-    {% for person in group.person_set.all %}
-      
-    {% endfor %}
-  {% elif group.person_set.all.count > 0 %}
-    <h3>People in your group:</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Diretary restrictions</th>
-          <th>RSVP</th>
-        </tr>
-      </thead>
-      {% for person in group.person_set.all %}
-        <tr>
-          <td><input type="text" value="{{ person.name }}"></td>
-          <td><input type="email" value="{{ person.email }}"></td>
-          <td><input type="text" value="{{ person.dietary_restrictions }}"></td>
-          <td><input type="text" value="{{ person.rsvp_status }}"></td>
-        </tr>
-      {% endfor %}
-    </table>
-  {% endif %} -->
-</form>
-{% endcomment %}
 </div>
+<form method="post">
+{% csrf_token %}
+{{ person_formset.management_form }}
 
 <div>
   <h2>Contact information</h2>
@@ -54,9 +95,26 @@
     wedding plans. If everything looks okay, you don't have to re-save your
     details.</p>
   <div class="flex-form">
-  <form method="post">
-    {% csrf_token %}
-    {{ gorup_form.non_field_errors }}
+    {% if group.person_set.all.count == 1 %}
+    {{ person_formset.non_field_errors }}
+    {% endif %}
+    {{ group_form.non_field_errors }}
+
+    {% if group.person_set.all.count == 1 %}
+    {% for person_form in person_formset %}{# there's only one #}
+    {% for field in person_form %}
+      {% if not field.is_hidden %}
+      <p>
+        <label for="{{ field.id_for_label }}"{% if field.errors %} class="error"{% endif %}>{{ field.label }}</label>
+      {% endif %}
+        {{ field }}
+      {% if not field.is_hidden %}
+      </p>
+      {% endif %}
+    {% endfor %}
+    {% endfor %}
+    {% endif %}
+
     {% for field in group_form %}
       {{ field.errors }}
     {% endfor %}
@@ -67,28 +125,42 @@
         {{ field }}
       </p>
     {% endfor %}
-    <p><button type="submit">Save details</button></p>
-  </form>
-  </div>
+   </div>
 </div>
-{% comment %}
-<div>
-  <h2>Summary of events</h2>
-  <p>
-    <a href="/details" title="Where + When">
-      <i class="fas fa-xs fa-fw fa-calendar"></i>&nbsp;Full details
-    </a>
-  </p>
 
-  <dl id="events">
-    {% for event in group.events.all %}
-    <dt>{{ event.name }}</dt>
-    <dd>{{ event.date_time }}<br/>
-      {{ event.venue }}<br/>
-      {{ event.address }}
-    </dd>
+{% if group.person_set.all.count > 1 %}
+<div>
+  <h2>People attending</h2>
+  {{ person_formset.non_field_errors }}
+  <table>
+  {% for person_form in person_formset %}
+    {% if forloop.first %}
+    <thead>
+      <tr>
+      {% for field in person_form %}
+      {% if not field.is_hidden %}
+        <th>{{ field.label }}</th>
+      {% endif %}
+      {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% endif %}
+      <tr>
+      {% for field in person_form %}
+        {% if not field.is_hidden %}<td{% if field.errors %} class="error"{% endif %}>{% endif %}
+        {{ field }}
+        {% if not field.is_hidden %}</td>{% endif %}
+      {% endfor %}
+      </tr>
+    {% if forloop.last %}
+    </tbody>
+    {% endif %}
     {% endfor %}
-  </dl>
+  </table>
 </div>
-{% endcomment %}
+{% endif %}
+
+<p><button type="submit">Save details</button></p>
+</form>
 {% endblock content %}

@@ -64,9 +64,7 @@ body {
   }
 
   th {
-    font-family: $heading-font;
     font-weight: 400;
-    font-size: 0.9em;
     text-align: left;
   }
 
@@ -162,6 +160,12 @@ body {
   label.error {
     color: $error-color;
   }
+
+  td.error {
+    input, select, textarea {
+      border-color: $error-color;
+    }
+  }
   
   address {
     white-space: pre-wrap;
@@ -193,6 +197,11 @@ body {
     textarea {
       border: none;
       padding: 0.5em;
+    }
+    input, textarea, select {
+      font-family: $heading-font;
+      font-weight: 400;
+      font-size: 1.6ex;
     }
   }
 
@@ -240,8 +249,12 @@ body {
         font-size: 80%;
       }
 
-      input, select {
-        width: 22em;
+      label {
+        width: 10em;
+      }
+
+      input, select, textarea {
+        width: 20em;
         padding: 0;
         border: none;
       }

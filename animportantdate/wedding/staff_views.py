@@ -2,7 +2,7 @@ from . import forms
 from . import mailouts
 from . import models
 
-from django.views.generic import ListView
+from django.views.generic import ListView, FormView
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
@@ -15,8 +15,8 @@ class InviteesView(UserPassesTestMixin, ListView):
     login_url = '/admin/login/'
     model = models.Group
     ordering = ['display_name']
-    template_name='wedding/lists/invitations.html'
-    
+    template_name = 'wedding/lists/invitations.html'
+
     def dispatch(self, request, *args, **kwargs):
         self.event = kwargs.get('event_id')
         return super().dispatch(request, *args, **kwargs)
@@ -41,7 +41,7 @@ class AttendeesView(UserPassesTestMixin, ListView):
     login_url = '/admin/login/'
     model = models.Person
     ordering = ['group', 'name']
-    template_name='wedding/lists/attendees.html'
+    template_name = 'wedding/lists/attendees.html'
 
     def dispatch(self, request, *args, **kwargs):
         self.event = kwargs.get('event_id')
@@ -67,7 +67,7 @@ class NeedToSendView(UserPassesTestMixin, ListView):
     login_url = '/admin/login/'
     model = models.NeedToSend
     ordering = ['added', 'who__display_name']
-    template_name='wedding/lists/need_to_sends.html'
+    template_name = 'wedding/lists/need_to_sends.html'
     what = None
 
     def get_context_data(self, **kwargs):
@@ -77,7 +77,8 @@ class NeedToSendView(UserPassesTestMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.filter(what=self.what).order_by('-sent', 'added', 'who__display_name')
+        qs = qs.filter(what=self.what).order_by(
+            '-sent', 'added', 'who__display_name')
         return qs
 
     def test_func(self):
@@ -93,14 +94,38 @@ class NeedToSendView(UserPassesTestMixin, ListView):
             return 'save_the_date'
 
 
+class AddDetailsSectionView(UserPassesTestMixin, FormView):
+    login_url = '/admin/login/'
+    form_class = forms.AddDetailsSectionForm
+    template_name = 'wedding/add_details_section.html'
+    success_url = '/admin/wedding/group/'
+
+    def get_initial(self):
+        if self.request.method != 'GET':
+            return self.initial
+        return {
+            'groups': self.request.GET.getlist('groups')
+        }
+
+    def form_valid(self, form):
+        for g in form.cleaned_data['groups']:
+            g.details_sections.add(*form.cleaned_data['details_sections'])
+        return redirect(self.get_success_url())
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
 @staff_member_required
 def mark_as_sent(request):
     nts = get_object_or_404(models.NeedToSend, pk=request.GET.get('nts', -1))
-    back_url = reverse(NeedToSendView.view_name_for_type(nts.what)) + "#" + request.GET.get('row', '')
+    back_url = reverse(NeedToSendView.view_name_for_type(
+        nts.what)) + "#" + request.GET.get('row', '')
     if request.method == 'GET':
         form = forms.MarkAsSentForm(
             instance=nts,
-            initial={'sent': timezone.now(), 'sent_note': 'Sent by {}'.format(request.user), 'row': request.GET.get('row', '')}
+            initial={'sent': timezone.now(), 'sent_note': 'Sent by {}'.format(
+                request.user), 'row': request.GET.get('row', '')}
         )
     else:
         form = forms.MarkAsSentForm(request.POST, instance=nts)
@@ -117,9 +142,11 @@ def mailout(request, mailout_id):
 
     mailout = models.Mailout.objects.get(id=mailout_id)
 
-    people_already_sent_id = models.MailSent.objects.filter(mailout=mailout).values('recipient__id').distinct()
+    people_already_sent_id = models.MailSent.objects.filter(
+        mailout=mailout).values('recipient__id').distinct()
     # groups_eligible = mailout.event.group_set.all()
-    people_eligible = models.Person.objects.filter(group__events=mailout.event, email__isnull=False).exclude(email='')
+    people_eligible = models.Person.objects.filter(
+        group__events=mailout.event, email__isnull=False).exclude(email='')
 
     initial = {
         "people": people_eligible.exclude(id__in=people_already_sent_id),
@@ -148,9 +175,10 @@ def mailout(request, mailout_id):
 
         if form.cleaned_data["action"] == forms.DoMailoutForm.ACTION_SEND_TEST:
             test_recipient = form.cleaned_data["test_recipient"]
-        
+
         try:
-            m = mailouts.MailoutHelper(mailout, form.cleaned_data["people"], test_recipient, send, form.cleaned_data["mark_as_sent"], form.cleaned_data["only_if_unsent"])
+            m = mailouts.MailoutHelper(mailout, form.cleaned_data["people"], test_recipient,
+                                       send, form.cleaned_data["mark_as_sent"], form.cleaned_data["only_if_unsent"])
             data["mailouts"] = m.messages
         except Exception as e:
             messages.error(request, str(e))
@@ -160,10 +188,12 @@ def mailout(request, mailout_id):
                 m.send_messages()
 
                 if test_recipient is None:
-                    messages.success(request, "The messages have been sent successfully")
+                    messages.success(
+                        request, "The messages have been sent successfully")
                     return redirect('admin:{}_{}_change'.format(mailout._meta.app_label, mailout._meta.model_name), mailout.id)
                 else:
-                    messages.success(request, "Test messages have been sent successfully to {}".format(test_recipient))
+                    messages.success(
+                        request, "Test messages have been sent successfully to {}".format(test_recipient))
                     return redirect('mailout', mailout.id)
 
             except Exception as e:
