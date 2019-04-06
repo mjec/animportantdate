@@ -256,11 +256,13 @@ class NeedToSend(models.Model):
     INVITATION = 1
     THANKYOU_CARD = 2
     SAVE_THE_DATE = 3
+    REMINDER = 4
 
     THINGS_TO_SEND = (
         (INVITATION, "Invitation"),
         (THANKYOU_CARD, "Thank you card"),
         (SAVE_THE_DATE, "Save the date"),
+        (REMINDER, "Reminder"),
     )
 
     who = models.ForeignKey(Group, on_delete=models.CASCADE)
