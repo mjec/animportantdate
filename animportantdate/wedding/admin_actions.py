@@ -35,6 +35,7 @@ def build_need_to_send(what):
 need_to_send_invitation = build_need_to_send(NeedToSend.INVITATION)
 need_to_send_thankyou_card = build_need_to_send(NeedToSend.THANKYOU_CARD)
 need_to_send_save_the_date = build_need_to_send(NeedToSend.SAVE_THE_DATE)
+need_to_send_reminder = build_need_to_send(NeedToSend.REMINDER)
 
 
 def add_details_section(modeladmin, request, queryset):
