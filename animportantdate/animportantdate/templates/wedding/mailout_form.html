@@ -55,7 +55,11 @@ dd {
         </dd>
         <dt>Subject</dt><dd>{{ message.subject }}</dd>
         <dt>Body</dt><dd>
+        {% if message.html_body %}
             <iframe srcdoc="{{ message.html_body|force_escape }}"></iframe>
+        {% else %}
+            <pre>{{ message.plain_body }}</pre>
+        {% endif %}
         </dd>
       </dl>
       {% if not forloop.last %}
