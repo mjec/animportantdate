@@ -87,6 +87,7 @@ class GroupAdmin(admin.ModelAdmin):
         need_to_send_save_the_date,
         need_to_send_invitation,
         need_to_send_thankyou_card,
+        need_to_send_reminder,
         add_details_section,
     ]
 
