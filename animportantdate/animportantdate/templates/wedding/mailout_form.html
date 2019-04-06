@@ -24,6 +24,10 @@ dd {
   width: calc(100% - 10em);
   margin: 0.5ex 0;
 }
+.message-body {
+    font-family: monospace;
+    white-space: pre-wrap;
+}
 </style>
 {% endblock %}
 {% block content %}
@@ -58,7 +62,7 @@ dd {
         {% if message.html_body %}
             <iframe srcdoc="{{ message.html_body|force_escape }}"></iframe>
         {% else %}
-            <pre>{{ message.plain_body }}</pre>
+            <p class="message-body">{{ message.plain_body }}</p>
         {% endif %}
         </dd>
       </dl>
