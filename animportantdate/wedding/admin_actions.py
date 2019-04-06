@@ -6,7 +6,7 @@ from django.urls import reverse
 
 __all__ = ['mark_as_sent_today', 'need_to_send_invitation',
            'need_to_send_thankyou_card', 'need_to_send_save_the_date',
-           'add_details_section']
+           'need_to_send_reminder', 'add_details_section']
 
 
 def mark_as_sent_today(modeladmin, request, queryset):
