@@ -128,7 +128,7 @@ def guest_details(request):
                     changed_fields_string))
             mail_alerts.group_contact_update(
                 group, changed_fields_string, new_invitation_required)
-            person_formset.save()
+        person_formset.save()
         messages.success(request, "Thank you! We've got your contact details.")
         return redirect(guest_details)
 
